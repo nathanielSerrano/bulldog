@@ -1,6 +1,6 @@
 /**
  * @author Nathaniel Serrano
- * @verison 17 February, 2025
+ * @version 17 February, 2025
  * COS 420, Spring 2025
  * Program 1
  * HumanPlayer class: extends Player class
