@@ -1,7 +1,7 @@
 /**
  * @authors - Nathaniel Serrano, ChatGPT 4o
  * @version - February 20, 2025
- * 
+ *
  * BulldogGameGUI represents the graphical user interface for the Bulldog game.
  * It manages the players, their turns, scores, and interactions with the game.
  */
@@ -13,25 +13,26 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+// ADDED FOR MVC INTEGRATION
+//import view.Viewer;
+//import model.PlayerList;
 
 public class BulldogGameGUI {
     private static final int WINNING_SCORE = 104;
-	private JFrame frame;
+    private JFrame frame;
     private JButton rollButton, endTurnButton;
     private JPanel playerPanel;
-    private ArrayList<Player> players;
+    private PlayerList playerList;
     private HashMap<Player, JPanel> playerPanels;
     private HashMap<Player, JLabel> playerScoreLabels;
     private HashMap<Player, JTextArea> playerLogs;
     private int currentPlayerIndex;
     private int turnScore;
     private boolean gameOver;
+    private Viewer scoreboard; // ADDED
 
-    /**
-     * Constructor initializes the game with an empty list of players.
-     */
-    public BulldogGameGUI() {
-        players = new ArrayList<>();
+    public BulldogGameGUI(PlayerList playerList) {
+        this.playerList = playerList;
         playerPanels = new HashMap<>();
         playerScoreLabels = new HashMap<>();
         playerLogs = new HashMap<>();
@@ -39,27 +40,10 @@ public class BulldogGameGUI {
         initializeGUI();
         startTurn();
     }
-    
-    /**
-     * Constructor initializes the game with a given list of players.
-     * @param players List of players participating in the game.
-     */
-    public BulldogGameGUI(ArrayList<Player> players) {
-    	this.players = players;
-        playerPanels = new HashMap<>();
-        playerScoreLabels = new HashMap<>();
-        playerLogs = new HashMap<>();
-        setupPlayers();
-        initializeGUI();
-        startTurn();
-    }
-    
-    /**
-     * Starts the turn for the current player. If the player is not human, plays automatically.
-     */
+
     private void startTurn() {
         if (gameOver) return;
-        Player player = players.get(currentPlayerIndex);
+        Player player = playerList.getPlayer(currentPlayerIndex);
         turnScore = 0;
         updatePlayerBorders();
         updatePlayerScores();
@@ -71,15 +55,13 @@ public class BulldogGameGUI {
             endTurn();
         }
     }
-    
-    /**
-     * Updates the visual borders of player panels to highlight the current player's turn.
-     */
+
     private void updatePlayerBorders() {
-        for (Player player : players) {
+        for (int i = 0; i < playerList.size(); i++) {
+            Player player = playerList.getPlayer(i);
             JPanel panel = playerPanels.get(player);
             if (panel != null) {
-                if (player == players.get(currentPlayerIndex) && player instanceof HumanPlayer) {
+                if (player == playerList.getPlayer(currentPlayerIndex) && player instanceof HumanPlayer) {
                     panel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
                 } else {
                     panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -90,26 +72,20 @@ public class BulldogGameGUI {
         playerPanel.repaint();
     }
 
-    /**
-     * Initializes the list of players and game variables.
-     */
     private void setupPlayers() {
         currentPlayerIndex = 0;
         turnScore = 0;
         gameOver = false;
     }
 
-    /**
-     * Initializes the graphical user interface components.
-     */
     private void initializeGUI() {
         frame = new JFrame("Bulldog Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 400);
+        frame.setSize(800, 500);
         frame.setLayout(new BorderLayout());
 
         playerPanel = new JPanel();
-        playerPanel.setLayout(new GridLayout(1, Math.min(players.size(), 5)));
+        playerPanel.setLayout(new GridLayout(1, Math.min(playerList.size(), 5)));
         frame.add(new JScrollPane(playerPanel), BorderLayout.CENTER);
 
         JPanel controlPanel = new JPanel();
@@ -124,18 +100,36 @@ public class BulldogGameGUI {
         frame.add(controlPanel, BorderLayout.NORTH);
 
         initializePlayerPanels();
+
+        scoreboard = new Viewer(playerList);
+
+        // Create a container panel for the label and scoreboard
+        JPanel scoreboardContainer = new JPanel();
+        scoreboardContainer.setLayout(new BorderLayout());
+
+        // Create and add the label
+        JLabel scoreboardLabel = new JLabel("SCOREBOARD", SwingConstants.CENTER);
+     	scoreboardLabel.setFont(new Font("Arial", Font.BOLD, 16));
+     	scoreboardContainer.add(scoreboardLabel, BorderLayout.NORTH);
+     
+     	// Add the viewer itself
+     	scoreboardContainer.add(scoreboard, SwingConstants.CENTER);
+
+     	// Add the whole scoreboard section to the frame
+     	frame.add(scoreboardContainer, BorderLayout.SOUTH);
+
+        
+
         frame.setVisible(true);
     }
 
-    /*
-     * Initializes components of game screen.
-     */
     private void initializePlayerPanels() {
         playerPanel.removeAll();
         playerPanels.clear();
         playerScoreLabels.clear();
-        
-        for (Player player : players) {
+
+        for (int i = 0; i < playerList.size(); i++) {
+            Player player = playerList.getPlayer(i);
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             JLabel nameLabel = new JLabel(player.getName());
@@ -146,17 +140,17 @@ public class BulldogGameGUI {
             playerLog.setWrapStyleWord(true);
             JScrollPane logScrollPane = new JScrollPane(playerLog);
             logScrollPane.setPreferredSize(new Dimension(150, 80));
-            
+
             panel.add(nameLabel);
             panel.add(scoreLabel);
             panel.add(logScrollPane);
-            
-            if (player == players.get(currentPlayerIndex) && player instanceof HumanPlayer) {
+
+            if (player == playerList.getPlayer(currentPlayerIndex) && player instanceof HumanPlayer) {
                 panel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
             } else {
                 panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             }
-            
+
             playerPanels.put(player, panel);
             playerScoreLabels.put(player, scoreLabel);
             playerLogs.put(player, playerLog);
@@ -166,21 +160,17 @@ public class BulldogGameGUI {
         playerPanel.repaint();
     }
 
-    /**
-     * Updates the UI components of the players' scores.
-     */
     private void updatePlayerScores() {
-        for (Player player : players) {
+        for (int i = 0; i < playerList.size(); i++) {
+            Player player = playerList.getPlayer(i);
             playerScoreLabels.get(player).setText("Score: " + player.getScore());
         }
+        scoreboard.refresh(); // ADDED
     }
 
-    /**
-     * Rolls the dice for the current player and updates the turn score.
-     */
     private void rollDice() {
         int roll = (int) (Math.random() * 6 + 1);
-        Player player = players.get(currentPlayerIndex);
+        Player player = playerList.getPlayer(currentPlayerIndex);
         logToPlayerColumn(player, player.getName() + " rolled " + roll);
 
         if (roll == 6) {
@@ -194,11 +184,8 @@ public class BulldogGameGUI {
         updatePlayerScores();
     }
 
-    /**
-     * Ends the current player's turn and checks for a winner.
-     */
     private void endTurn() {
-        Player player = players.get(currentPlayerIndex);
+        Player player = playerList.getPlayer(currentPlayerIndex);
         player.setScore(player.getScore() + turnScore);
         logToPlayerColumn(player, player.getName() + " ends turn with " + player.getScore() + " total points.");
         updatePlayerScores();
@@ -212,59 +199,50 @@ public class BulldogGameGUI {
             return;
         }
 
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerList.size();
         startTurn();
     }
 
-    /**
-     * Displays a popup announcing the winner of the game.
-     * @param winner The player who won the game.
-     */
     private void showWinnerPopup(Player winner) {
         frame.setEnabled(false);
         JFrame popup = new JFrame("Game Over");
         popup.setSize(500, 150);
         popup.setLayout(new BorderLayout());
-        
+
         JLabel message = new JLabel(winner.getName() + " wins with " + winner.getScore() + " points!", SwingConstants.CENTER);
         popup.add(message, BorderLayout.CENTER);
-        
+
         JPanel buttonPanel = new JPanel();
         JButton newGameButton = new JButton("New Game");
         JButton quitButton = new JButton("Quit");
         JButton againButton = new JButton("Play Again");
-        
+
         newGameButton.addActionListener(e -> {
             popup.dispose();
             frame.dispose();
             new PlayerSetupScreen();
         });
-        
+
         quitButton.addActionListener(e -> System.exit(0));
-        
+
         againButton.addActionListener(e -> {
-        	popup.dispose();
-        	frame.dispose();
-        	for (Player p: players) {
-        		p.setScore(0);
-        	}
-        	new BulldogGameGUI(players);
+            popup.dispose();
+            frame.dispose();
+            for (int i = 0; i < playerList.size(); i++) {
+                playerList.setPlayerScore(i, 0);
+            }
+            new BulldogGameGUI(playerList);
         });
-        
+
         buttonPanel.add(newGameButton);
         buttonPanel.add(againButton);
         buttonPanel.add(quitButton);
         popup.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         popup.setLocationRelativeTo(frame);
         popup.setVisible(true);
     }
 
-    /**
-     * Logs messages to the player's column in the UI.
-     * @param player The player whose log is updated.
-     * @param message The message to display.
-     */
     private void logToPlayerColumn(Player player, String message) {
         JTextArea playerLog = playerLogs.get(player);
         if (playerLog != null) {
@@ -273,14 +251,11 @@ public class BulldogGameGUI {
         }
     }
 
-    /**
-     * The main entry point for the game, initializes the player setup screen.
-     * @param args Command-line arguments.
-     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(PlayerSetupScreen::new);
     }
 }
+
 
 
 /**
@@ -397,17 +372,17 @@ class PlayerSetupScreen {
             return;
         }
         
-        ArrayList<Player> gamePlayers = new ArrayList<>();
+        PlayerList gamePlayers = new PlayerList();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             String name = (String) tableModel.getValueAt(i, 0);
             String type = (String) tableModel.getValueAt(i, 1);
             switch (type) {
-                case "HumanPlayer" -> gamePlayers.add(new HumanPlayer(name));
-                case "RandomPlayer" -> gamePlayers.add(new RandomPlayer(name));
-                case "FifteenPlayer" -> gamePlayers.add(new FifteenPlayer(name));
-                case "UniquePlayer" -> gamePlayers.add(new UniquePlayer(name));
-                case "WimpPlayer" -> gamePlayers.add(new WimpPlayer(name));
-                default -> gamePlayers.add(new RandomPlayer(name));
+                case "HumanPlayer" -> gamePlayers.addPlayer(new HumanPlayer(name));
+                case "RandomPlayer" -> gamePlayers.addPlayer(new RandomPlayer(name));
+                case "FifteenPlayer" -> gamePlayers.addPlayer(new FifteenPlayer(name));
+                case "UniquePlayer" -> gamePlayers.addPlayer(new UniquePlayer(name));
+                case "WimpPlayer" -> gamePlayers.addPlayer(new WimpPlayer(name));
+                default -> gamePlayers.addPlayer(new RandomPlayer(name));
             }
         }
         setupFrame.dispose();
