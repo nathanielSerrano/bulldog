@@ -46,26 +46,7 @@ public class Prog6 {
                 }
             }
         }
-
-        // Gameplay loop using PlayerList
-        boolean gameOver = false;
-        while (!gameOver) {
-            for (int i = 0; i < playerList.size(); i++) {
-                Player player = playerList.getPlayer(i);
-                System.out.println("\n" + player.getName() + "'s turn:");
-                int turnScore = player.play();
-                int newScore = player.getScore() + turnScore;
-                playerList.setPlayerScore(i, newScore);
-                System.out.println("Total score for " + player.getName() + ": " + newScore);
-
-                if (newScore >= WINNING_SCORE) {
-                    System.out.println(player.getName() + " wins!");
-                    gameOver = true;
-                    break;
-                }
-            }
-        }
-
+        Referee.getInstance().playGame(playerList, WINNING_SCORE);
         scanner.close();
     }
 }
