@@ -16,7 +16,7 @@ class FakeRandomTest {
 	@Test
 	void testSevenPlayer() {
 		SevenPlayer test = new SevenPlayer("test");
-		test.getDice().setSeed("1234");
+		test.getDice().setSeed("1 2 3 4");
 		assertEquals(0,test.getScore());
 		assertEquals(10,test.play());
 	}
@@ -25,7 +25,7 @@ class FakeRandomTest {
 	@Test 
 	void testSevenLimit() {
 		SevenPlayer test = new SevenPlayer("test");
-		test.getDice().setSeed("1111111111");		// 10 1's in a String
+		test.getDice().setSeed("1 1 1 1 1 1 1 1 1 1");		// 10 1's in a String
 		assertEquals(7, test.play());
 				
 	}
@@ -35,7 +35,7 @@ class FakeRandomTest {
 	@Test
 	void test6Score() {
 		SevenPlayer test = new SevenPlayer("test");
-		test.getDice().setSeed("222");
+		test.getDice().setSeed("2 2 2");
 		int score = test.play();
 		assertEquals(8, score);
 		assertNotEquals(0, score);
@@ -46,7 +46,7 @@ class FakeRandomTest {
 	@Test 
 	void testMaxScore() {
 		SevenPlayer test = new SevenPlayer("test");
-		test.getDice().setSeed("4256");
+		test.getDice().setSeed("4 2 5 6");
 		int score = test.play();
 		assertEquals(11, score);
 		assertNotEquals(0, score);
@@ -56,7 +56,7 @@ class FakeRandomTest {
 	@Test
 	void testRoll6() {
 		SevenPlayer test = new SevenPlayer("test");
-		test.getDice().setSeed("1236");
+		test.getDice().setSeed("1 2 3 6");
 		int score = test.play();
 		assertEquals(0, score);
 		assertNotEquals(12, score);
@@ -73,10 +73,10 @@ class FakeRandomTest {
 	// Test that the custom constructor changes the FakeRandom object's seed value and sets the number of sides.
 	@Test
 	void testFakeRandomConstruction() {
-		FakeRandom test = new FakeRandom(6, "238123");
+		FakeRandom test = new FakeRandom(6, "2 3 8 1 2 3");
 		assertEquals(6,test.getSides());
-		assertEquals("238123", test.getSeed());
-		assertNotEquals("163524651243", test.getSeed());
+		assertEquals("2 3 8 1 2 3", test.getSeed());
+		assertNotEquals("1 6 3 5 2  4 6 5 1 2 4 3", test.getSeed());
 	}
 	/**
 	 *  Test a seed that has fewer numbers then the number of times roll() is called.
@@ -97,8 +97,8 @@ class FakeRandomTest {
 	 */
 	@Test
 	void testMultipleSameSeed() {
-		RandomDice die1 = new FakeRandom(6, "1423");
-		RandomDice die2 = new FakeRandom(6, "1423");
+		RandomDice die1 = new FakeRandom(6, "1 4 2 3");
+		RandomDice die2 = new FakeRandom(6, "1 4 2 3");
 		
 		die1.roll();
 		int secondRoll1=die1.roll();

@@ -9,7 +9,7 @@
 public class FakeRandom extends RandomDice {
 	
 	private int i = 0;
-	private String seed = "163524651243";		// Default seed value
+	private String seed = "1 6 3 5 2 4 6 5 1 2 4 3";		// Default seed value
 	
     /**
      * Constructor - Initializes a FakeRandom object with a given number of sides.
@@ -40,17 +40,21 @@ public class FakeRandom extends RandomDice {
 	}
 	
 	public void setSeed(String str) {
-		if (str.matches("\\d+")) {
-			seed = str;
-		} else {
-			System.out.println("Invalid seed inputted, set to default value.");
+		for (String n: str.split(" ")) {
+			if (!n.matches("\\d+")) {
+				System.out.println("Invalid seed inputted, set to default value.");
+				break;
+			} else {
+				seed = str;
+			}
 		}
 	}
 	
 	public int roll() {
-		char resultChar = seed.charAt(i);
-	    int result = resultChar - '0';
-	    if (i<seed.length()-1) {
+		String[] nums = seed.split(" ");
+		String resultChar = nums[i];
+		int result = Integer.parseInt(resultChar);
+	    if (i<nums.length-1) {
 	    	i++;
 	    } else {
 	    	i = 0;
