@@ -10,7 +10,7 @@
 import java.util.Scanner;
 
 public class Prog6 {
-    private static final int WINNING_SCORE = 104;
+    protected static final int WINNING_SCORE = 104;
 
     /**
      * Main method - Runs the Bulldog game.
@@ -34,7 +34,7 @@ public class Prog6 {
             String name = scanner.nextLine();
 
             switch (choice) {
-                case 1 -> playerList.addPlayer(new HumanPlayer(name));
+                case 1 -> playerList.addPlayer(new HumanPlayer(name, true));
                 case 2 -> playerList.addPlayer(new RandomPlayer(name));
                 case 3 -> playerList.addPlayer(new FifteenPlayer(name));
                 case 4 -> playerList.addPlayer(new UniquePlayer(name));

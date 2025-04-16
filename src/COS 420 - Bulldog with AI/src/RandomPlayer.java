@@ -1,27 +1,24 @@
 /**
- * @author Nathaniel Serrano, ChatGPT AI
- * @version 2 March, 2025
- * COS 420, Spring 2025
- * Program 5
+ * RandomPlayer randomly decides whether to continue or end their turn.
+ * Uses a 2-sided die for randomness.
  * 
- * RandomPlayer represents a player that makes random decisions when playing.
+ * @author Nathaniel Serrano, ChatGPT AI
+ * @version 15 April, 2025
  */
 public class RandomPlayer extends Player {
-	
-	private Dice randomPlayerDice = new Dice(2);
-	
+    private final RandomDice coin;
+
     public RandomPlayer(String name) {
         super(name);
+        this.coin = new RandomDice(2); // simulate coin flip
     }
 
-    public int play() {
-        int turnTotal = 0;
-        while (true) {
-            int roll = dice.roll();
-            System.out.println(getName() + " rolled " + roll);
-            if (roll == 6) return 0;
-            turnTotal += roll;
-            if (randomPlayerDice.roll()==2) return turnTotal;
-        }
+    /**
+     * Randomly returns true or false using a 2-sided die.
+     */
+    @Override
+    public boolean continueTurn(GameStatus status) {
+        return coin.roll() == 1; // continue if result is 1
     }
 }
+

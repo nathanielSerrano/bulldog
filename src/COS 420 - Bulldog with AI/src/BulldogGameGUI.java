@@ -377,7 +377,7 @@ class PlayerSetupScreen {
             String name = (String) tableModel.getValueAt(i, 0);
             String type = (String) tableModel.getValueAt(i, 1);
             switch (type) {
-                case "HumanPlayer" -> gamePlayers.addPlayer(new HumanPlayer(name));
+                case "HumanPlayer" -> gamePlayers.addPlayer(new HumanPlayer(name, false));
                 case "RandomPlayer" -> gamePlayers.addPlayer(new RandomPlayer(name));
                 case "FifteenPlayer" -> gamePlayers.addPlayer(new FifteenPlayer(name));
                 case "UniquePlayer" -> gamePlayers.addPlayer(new UniquePlayer(name));

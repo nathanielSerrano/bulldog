@@ -7,12 +7,17 @@
 /*           player of the game Bulldog                 */
 /*      See Kettering University, CS-101, Prog 6        */
 /********************************************************/
+/* Updated by Nathaniel Serrano, ChatGPT 4o 			*/
+/* @version 15 April, 2025 								*/
 
 public abstract class Player {
 	
 	private String name;   	// The name of the Player
 	
 	private int score;		// The score earned by this Player during the game
+	
+    protected final Dice dice;	// Dice object for each Player
+
 	
 	/********************************************************/
 	/* Constructor: Player                                  */
@@ -23,6 +28,7 @@ public abstract class Player {
 	public Player (String name) {
 		this.name = name;
 		this.score = 0;
+		this.dice = new RandomDice(6);		// Create new Dice object
 	}
 	
 	/********************************************************/
@@ -61,16 +67,43 @@ public abstract class Player {
 		this.score = score;
 	}
 	
-	/********************************************************/
-	/* Method:  play                                        */
-	/* Purpose: abstract method that encapsulates one turn  */
-	/*          for this Player                             */
-	/* Parameters:                                          */
-	/*   none                                               */
-	/* Returns:                                             */
-	/*   the score earned by the player on this turn,       */
-	/*       which will be zero if a six was rolled         */
-	/********************************************************/
-	public abstract int play();
+    /********************************************************/
+    /* Method:  play                                        */
+    /* Purpose: runs a complete turn for this Player        */
+    /* Returns:                                             */
+    /*   the score earned by the player on this turn,       */
+    /*   which will be zero if a six was rolled             */
+    /********************************************************/
+    public int play() {
+        int turnTotal = 0;
+
+        while (true) {
+            int roll = dice.roll();
+            System.out.println(getName() + " rolled " + roll);
+
+            if (roll == 6) {
+                return 0; // rolling a 6 ends turn with zero points
+            }
+
+            turnTotal += roll;
+
+            GameStatus status = new GameStatus(roll, turnTotal, score);
+
+            if (!continueTurn(status)) {
+                return turnTotal;
+            }
+        }
+    }
+
+    /********************************************************/
+    /* Method:  continueTurn                                */
+    /* Purpose: Abstract strategy decision on whether to    */
+    /*          continue playing this turn or stop          */
+    /* Parameters:                                          */
+    /*   GameStatus status - snapshot of current turn info  */
+    /* Returns:                                             */
+    /*   true if player should roll again, false to stop    */
+    /********************************************************/
+    public abstract boolean continueTurn(GameStatus status);
 	
 }
