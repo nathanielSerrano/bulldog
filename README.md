@@ -10,11 +10,11 @@ The game of Bulldog is played by several players, who each take turns rolling a 
 However, if the player rolls a 6, the player loses their score for that turn. The game ends when any player's score is greater than or equal to the winning score, which is 104 points by default.
 
 ## Navigating the Repository
- * The `Bulldog Writeups` directory contains files in .pdf format that possess lab books and reflections on different Bulldog Assignments and updates.
- * The `src` directory contains two subdirectories:
-   * `Bulldog`
+ * The `Bulldog Writeups/` directory contains files in .pdf format that possess lab books and reflections on different Bulldog Assignments and updates.
+ * The `src/` directory contains two subdirectories:
+   * `Bulldog/`
      * An early implementation of the Bulldog game without the use of AI tools. No updates were made to this version after its initial creation.
-   * `Bulldog with AI`
+   * `Bulldog with AI/`
      * The final release of Bulldog, created with the assistance of AI tools. This form of Bulldog offers ways to play it through a GUI made in Java's Swing or the CLI.
     
 ## How to Run
